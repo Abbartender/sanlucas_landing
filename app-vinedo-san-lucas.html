@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tu recorrido por San Lucas</title>
+  <style>
+    :root {
+      --bg: #0f0d0a;
+      --card: rgba(255, 252, 245, 0.92);
+      --text: #241b16;
+      --muted: #75675f;
+      --gold: #b89b5e;
+      --wine: #4b171f;
+      --soft: #f5efe4;
+      --line: rgba(36, 27, 22, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(rgba(15,13,10,0.58), rgba(15,13,10,0.72)),
+        url("https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1800&q=80");
+      background-size: cover;
+      background-position: center;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      min-height: 680px;
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 34px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      position: relative;
+    }
+
+    .top {
+      padding: 30px 30px 10px;
+      text-align: center;
+    }
+
+    .brand {
+      font-family: Georgia, "Times New Roman", serif;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+
+    .progress {
+      height: 4px;
+      background: rgba(36,27,22,0.09);
+      border-radius: 50px;
+      overflow: hidden;
+      margin: 0 30px;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--wine));
+      transition: width 0.35s ease;
+    }
+
+    .screen {
+      display: none;
+      padding: 26px 30px 34px;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1, h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 400;
+      line-height: 1.08;
+      margin: 0 0 18px;
+      color: var(--text);
+    }
+
+    h1 {
+      font-size: 42px;
+    }
+
+    h2 {
+      font-size: 34px;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.58;
+      color: var(--muted);
+      margin: 0 0 22px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+      padding: 15px 16px;
+      font-size: 15px;
+      outline: none;
+      color: var(--text);
+    }
+
+    input:focus, select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(184,155,94,0.13);
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+      margin: 22px 0 26px;
+    }
+
+    .option {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.58);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 16px;
+    }
+
+    .option:hover {
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .option.selected {
+      background: var(--wine);
+      color: white;
+      border-color: var(--wine);
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      background: var(--wine);
+      color: white;
+      padding: 16px 22px;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(75,23,31,0.25);
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--wine);
+      border: 1px solid rgba(75,23,31,0.22);
+    }
+
+    .skip {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 20px;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .note {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      color: var(--muted);
+      margin: 18px 0 8px;
+      display: none;
+    }
+
+    .coupon {
+      margin: 26px 0;
+      padding: 26px;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(75,23,31,0.96), rgba(36,27,22,0.96));
+      color: white;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    .coupon small {
+      display: block;
+      color: rgba(255,255,255,0.68);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .coupon strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 58px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .coupon .code {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 10px 16px;
+      border: 1px dashed rgba(255,255,255,0.46);
+      border-radius: 999px;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+    }
+
+    .fine {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .summary {
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 0;
+        align-items: stretch;
+      }
+
+      .app {
+        min-height: 100vh;
+        border-radius: 0;
+        max-width: none;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="app">
+    <div class="top">
+      <div class="brand">Viñedo San Lucas</div>
+    </div>
+
+    <div class="progress"><span id="progressBar"></span></div>
+
+    <!-- Pantalla 1 -->
+    <section class="screen active" data-screen="0">
+      <h1>Tu recorrido por San Lucas</h1>
+      <p>
+        Cada persona vive el vino de una manera distinta.
+        Te invitamos a guardar tu experiencia de hoy y recibir un beneficio especial válido por 24 hs en nuestra tienda y restaurante.
+      </p>
+
+      <div class="field">
+        <label>Nombre y apellido</label>
+        <input id="name" type="text" placeholder="Ej. María González" />
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="email" type="email" placeholder="tu@email.com" />
+      </div>
+
+      <div class="field">
+        <label>Teléfono / WhatsApp</label>
+        <input id="phone" type="tel" placeholder="+52..." />
+      </div>
+
+      <div class="field">
+        <label>¿Desde dónde nos visitás?</label>
+        <input id="origin" type="text" placeholder="Ciudad / País" />
+      </div>
+
+      <button class="button" onclick="nextScreen()">Comenzar experiencia</button>
+    </section>
+
+    <!-- Pantalla 2 -->
+    <section class="screen" data-screen="1">
+      <h2>¿Qué vinos recordás haber probado hoy?</h2>
+      <p>Podés elegir uno o varios. No hay respuestas correctas, solo recuerdos de tu recorrido.</p>
+
+      <div class="options multi" data-key="vinos_probados">
+        <div class="option">Vino blanco</div>
+        <div class="option">Vino rosado</div>
+        <div class="option">Vino espumoso</div>
+        <div class="option">Tinto joven</div>
+        <div class="option">Vino con barrica</div>
+        <div class="option">No estoy seguro</div>
+      </div>
+
+      <button class="button" onclick="nextScreen()">Continuar</button>
+      <div class="skip" onclick="skipScreen()">Prefiero pasar</div>
+    </section>
+
+    <!-- Pantalla 3 -->
+    <section class="screen" data-screen="2">
+      <h2>¿Cuál sentís que conectó más con vos?</h2>
+      <p>Elegí la sensación que mejor representa tu experiencia.</p>
+
+      <div class="options single" data-key="conexion">
+        <div class="option">El más fresco</div>
+        <div class="option">El más intenso</div>
+        <div class="option">El más elegante</div>
+        <div class="option">El más fácil de tomar</div>
+        <div class="option">El más gastronómico</div>
+        <div class="option">El que más me sorprendió</div>
+      </div>
+
+      <button class="button" onclick="nextScreen()">Continuar</button>
+      <div class="skip" onclick="skipScreen()">Prefiero pasar</div>
+    </section>
+
+    <!-- Pantalla 4 -->
+    <section class="screen" data-screen="3">
+      <h2>Algunos vinos también cuentan su historia desde la uva.</h2>
+      <p>¿Recordás con qué uva se elabora el rosado de San Lucas?</p>
+
+      <div class="options single technical" data-key="uva_rosado">
+        <div class="option">Malbec</div>
+        <div class="option">Syrah</div>
+        <div class="option">Cabernet Sauvignon</div>
+        <div class="option" data-reveal="true">No lo recuerdo, quiero descubrirlo</div>
+      </div>
+
+      <div class="note" id="technicalNote">
+        No hace falta recordar todo para disfrutar un vino. Después te contamos más sobre él.
+      </div>
+
+      <button class="button" onclick="nextScreen()">Continuar</button>
+      <div class="skip" onclick="skipScreen()">Prefiero pasar</div>
+    </section>
+
+    <!-- Pantalla 5 -->
+    <section class="screen" data-screen="4">
+      <h2>Si tuvieras que hacerle probar un vino de San Lucas a alguien importante...</h2>
+      <p>¿Cuál elegirías para contarle lo que viviste hoy?</p>
+
+      <div class="options single" data-key="vino_recomendado">
+        <div class="option">Vino blanco</div>
+        <div class="option">Vino rosado</div>
+        <div class="option">Vino espumoso</div>
+        <div class="option">Tinto joven</div>
+        <div class="option">Vino con barrica</div>
+      </div>
+
+      <button class="button" onclick="nextScreen()">Continuar</button>
+      <div class="skip" onclick="skipScreen()">Prefiero pasar</div>
+    </section>
+
+    <!-- Pantalla 6 -->
+    <section class="screen" data-screen="5">
+      <h2>¿Cómo describirías esta experiencia?</h2>
+      <p>Una palabra alcanza para guardar el recuerdo.</p>
+
+      <div class="options single" data-key="descripcion">
+        <div class="option">Relajada</div>
+        <div class="option">Elegante</div>
+        <div class="option">Sorprendente</div>
+        <div class="option">Cercana</div>
+        <div class="option">Diferente</div>
+        <div class="option">Para repetir</div>
+      </div>
+
+      <button class="button" onclick="finishExperience()">Guardar experiencia</button>
+      <div class="skip" onclick="finishExperience()">Prefiero pasar</div>
+    </section>
+
+    <!-- Pantalla final -->
+    <section class="screen" data-screen="6">
+      <h2>Tu experiencia en San Lucas quedó guardada.</h2>
+      <p>
+        Gracias por compartir este recorrido con nosotros.
+        Como parte de la experiencia, activamos un beneficio exclusivo válido durante las próximas 24 hs.
+      </p>
+
+      <div class="coupon">
+        <small>Beneficio instantáneo</small>
+        <strong>10% OFF</strong>
+        <div class="code" id="couponCode">SANLUCAS-0000</div>
+      </div>
+
+      <p class="fine">
+        Válido por 24 hs en tienda física, compra de vinos o consumo en restaurante.
+        Presentá este código al momento de pagar.
+      </p>
+
+      <div class="summary" id="summary"></div>
+
+      <button class="button" onclick="window.print()">Guardar / imprimir beneficio</button>
+      <button class="button secondary" onclick="restart()">Crear otro recorrido</button>
+    </section>
+  </main>
+
+  <script>
+    let current = 0;
+    const totalScreens = 7;
+    const answers = {};
+
+    const screens = document.querySelectorAll(".screen");
+    const progressBar = document.getElementById("progressBar");
+
+    function updateProgress() {
+      const percent = (current / (totalScreens - 1)) * 100;
+      progressBar.style.width = percent + "%";
+    }
+
+    function showScreen(index) {
+      screens.forEach(screen => screen.classList.remove("active"));
+      screens[index].classList.add("active");
+      current = index;
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function nextScreen() {
+      if (current === 0) {
+        answers.nombre = document.getElementById("name").value.trim();
+        answers.email = document.getElementById("email").value.trim();
+        answers.telefono = document.getElementById("phone").value.trim();
+        answers.origen = document.getElementById("origin").value.trim();
+
+        if (!answers.nombre || !answers.email || !answers.telefono || !answers.origen) {
+          alert("Para comenzar, completá nombre, email, teléfono y lugar de visita.");
+          return;
+        }
+      }
+
+      if (current < totalScreens - 1) showScreen(current + 1);
+    }
+
+    function skipScreen() {
+      const activeOptions = screens[current].querySelector(".options");
+      if (activeOptions) {
+        answers[activeOptions.dataset.key] = "Prefirió pasar";
+      }
+      nextScreen();
+    }
+
+    document.querySelectorAll(".options").forEach(group => {
+      group.addEventListener("click", event => {
+        const option = event.target.closest(".option");
+        if (!option) return;
+
+        const key = group.dataset.key;
+
+        if (group.classList.contains("multi")) {
+          option.classList.toggle("selected");
+          const selected = [...group.querySelectorAll(".selected")].map(el => el.textContent.trim());
+          answers[key] = selected;
+        } else {
+          group.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+          option.classList.add("selected");
+          answers[key] = option.textContent.trim();
+        }
+
+        if (option.dataset.reveal === "true") {
+          document.getElementById("technicalNote").style.display = "block";
+        }
+      });
+    });
+
+    function finishExperience() {
+      const activeOptions = screens[current].querySelector(".options");
+      if (activeOptions && !answers[activeOptions.dataset.key]) {
+        answers[activeOptions.dataset.key] = "Prefirió pasar";
+      }
+
+      const randomCode = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById("couponCode").textContent = "SANLUCAS-" + randomCode;
+
+      const summary = `
+        <strong>Visitante:</strong> ${answers.nombre || "-"}<br>
+        <strong>Origen:</strong> ${answers.origen || "-"}<br>
+        <strong>Vinos recordados:</strong> ${formatAnswer(answers.vinos_probados)}<br>
+        <strong>Perfil de experiencia:</strong> ${formatAnswer(answers.descripcion)}
+      `;
+
+      document.getElementById("summary").innerHTML = summary;
+
+      /*
+        Acá se puede conectar con Formspree, Brevo, Google Sheets, Airtable o CRM.
+        Ejemplo:
+        fetch("TU_ENDPOINT_AQUI", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(answers)
+        });
+      */
+
+      showScreen(6);
+    }
+
+    function formatAnswer(value) {
+      if (!value) return "-";
+      if (Array.isArray(value)) return value.length ? value.join(", ") : "-";
+      return value;
+    }
+
+    function restart() {
+      location.reload();
+    }
+
+    updateProgress();
+  </script>
+
+</body>
+</html>
